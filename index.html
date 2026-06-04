@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <title>House Price Predictor</title>
+  </head>
+  <body class="bg-dark">
+     <div class="container">
+         <div class="row">
+             <div class="card" style="width: 100%; height: 100%; margin-top: 50px">
+                <div class="card-header" style="text-align: center">
+                    <h1>Welcome to House Price Prediction</h1>
+                </div>
+                 <div class="card-body">
+                     <form method="post" accept-charset="utf-8">
+                         <div class="row">
+                             <div class="col-md-6 form-group" style="text-align: center">
+                                 <label><b>Select The Location:</b></label>
+                                 <select class="selectpicker form-control" id="location" name="location" required>
+                                      {% for location in locations %}
+                                          <option value="{{ location }}">{{ location }}</option>
+                                      {% endfor %}
+                                 </select>
+                             </div>
+                             <div class="col-md-6 form-group" style="text-align: center">
+                                 <label><b>Enter BHK:</b></label>
+                                 <!-- ✅ type="number" + required + min added -->
+                                 <input type="number" class="form-control" id="bhk" name="bhk"
+                                        placeholder="Enter BHK" required min="1">
+                             </div>
+                             <div class="col-md-6 form-group" style="text-align: center">
+                                 <label><b>Enter No. of Bathrooms:</b></label>
+                                 <input type="number" class="form-control" id="bath" name="bath"
+                                        placeholder="Enter No. of Bathrooms" required min="1">
+                             </div>
+                             <div class="col-md-6 form-group" style="text-align: center">
+                                 <label><b>Enter Square Feet:</b></label>
+                                 <input type="number" class="form-control" id="total_sqft" name="total_sqft"
+                                        placeholder="Enter Feet" required min="1">
+                             </div>
+                             <div class="col-md-12 form-group mt-3">
+                                 <!-- ✅ type="button" — form submit nahi hoga, sirf send_data() chalega -->
+                                 <button type="button" class="btn btn-primary form-control"
+                                         onclick="send_data()">Predict Price</button>
+                             </div>
+                         </div>
+                     </form>
+                     <br>
+                     <div class="col-md-12" style="text-align: center">
+                         <h3><span id="prediction"></span></h3>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+     <script>
+         function send_data() {
+             var location = document.getElementById("location").value;
+             var bhk = document.getElementById("bhk").value;
+             var bath = document.getElementById("bath").value;
+             var sqft = document.getElementById("total_sqft").value;
+
+             if (!bhk || !bath || !sqft) {
+                 alert("Please fill all fields before predicting!");
+                 return;
+             }
+
+             var fd = new FormData(document.querySelector('form'));
+             var xhr = new XMLHttpRequest();
+             xhr.open('POST', '/predict', true);
+
+             document.getElementById("prediction").innerHTML = "⏳ Wait... Predicting Price!";
+
+             xhr.onreadystatechange = function() {
+                 if (xhr.readyState == XMLHttpRequest.DONE) {
+                     if (xhr.status == 200) {
+                         document.getElementById('prediction').innerHTML =
+                             "🏠 Predicted Price: ₹" + xhr.responseText;
+                     } else {
+                         document.getElementById('prediction').innerHTML =
+                             "❌ Error occurred. Please try again.";
+                     }
+                 }
+             };
+             xhr.send(fd);
+         }
+     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>
